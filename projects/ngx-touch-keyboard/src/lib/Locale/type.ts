@@ -8,6 +8,7 @@ export interface Display {
 
 export interface Locale {
   code: string;
+  flag: string;
   dir: 'ltr' | 'rtl';
   layouts: Layout;
   display: Display;

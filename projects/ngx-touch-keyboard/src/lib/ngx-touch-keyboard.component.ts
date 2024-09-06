@@ -11,7 +11,8 @@ import {
 } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
-import { fnButton } from './Locale/constants';
+import { fnButton,fnDisplay} from './Locale/constants';
+
 import { Locale } from './Locale/type';
 import * as Locales from './Locale';
 
@@ -37,6 +38,8 @@ export class NgxTouchKeyboardComponent {
   private _caretPosition: number | null = null;
   private _caretPositionEnd: number | null = null;
   private _activeInputElement!: HTMLInputElement | HTMLTextAreaElement | null;
+  private _firstlang!: string | null;
+  private _secondlang!: string | null;
 
   /**
    * Constructor
@@ -127,14 +130,24 @@ export class NgxTouchKeyboardComponent {
     // normalize value
     value = value.replace('-', '').trim();
     // Set Locale if supported
+    
     if ((Object.keys(Locales) as readonly string[]).includes(value)) {
       this.locale = Locales[value as 'enUS'];
     }
+  
     // Set default Locale if not supported
     else {
       this.locale = Locales.enUS;
     }
   }
+
+  Lswitcher(fl:string, sl:string){
+     this._firstlang=fl
+    this._secondlang=sl
+}
+
+
+
 
   /**
    * Set active input
@@ -233,10 +246,50 @@ export class NgxTouchKeyboardComponent {
    * @return The display name to be show to the button
    */
   getButtonDisplayName(button: string): SafeHtml {
-    return this._sanitizer.bypassSecurityTrustHtml(
-      this.locale.display[button] || button
-    );
+    
+    if (button === '{language}') {
+
+
+       this.toggleLanguageButtonFalg(); 
+
+    }
+    const displayName = this.locale.display[button] || button;
+    return this._sanitizer.bypassSecurityTrustHtml(displayName);
+}
+
+
+
+toggleLanguageButtonFalg() {
+  if (this._firstlang && this._secondlang  && this._firstlang !== 'undefined' && this._secondlang  !== 'undefined') {
+   
+   
+    console.log(this._firstlang +"---"+ this._secondlang);
+    
+ 
+    
+    // Both languages are available, proceed with toggle
+    if (this.locale.code === this._firstlang) {
+
+      let iflag = this._secondlang.replace('-', '').trim();
+      let localeflag = Locales[iflag as keyof typeof Locales];
+      this.locale.display['{language}'] = localeflag.flag;
+    }else if(this.locale.code === this._secondlang){
+
+      console.log(this._firstlang +"-1--"+ this._secondlang);
+
+      let iflag = this._firstlang.replace('-', '').trim();
+      let localeflag = Locales[iflag as keyof typeof Locales];
+      
+      // Set the language button display to the flag of _firstlang
+      this.locale.display['{language}'] = localeflag.flag;
+    }
+  } else {
+    // Remove the button by setting its text to an empty string
+    this.locale.display['{language}'] = 'nolang';
   }
+}
+
+  
 
   /**
    * Handles clicks made to keyboard buttons
@@ -285,6 +338,31 @@ export class NgxTouchKeyboardComponent {
           output = this._addStringAt(output, '\n', ...commonParams);
         }
       }
+
+      else if (button === fnButton.LANGUAGE) {
+
+      
+        
+        if (this.locale.code===this._firstlang) {
+          
+
+          this.setLocale(`${this._secondlang}`)
+          
+          
+       
+        }else if (this.locale.code===this._secondlang) {
+          
+          this.setLocale(`${this._firstlang}`)
+
+        }
+       
+
+
+
+      
+      }
+
+     
       // Handel LAYOUT
       else {
         this.layoutName = button.substring(1, button.length - 1);
@@ -320,6 +398,9 @@ export class NgxTouchKeyboardComponent {
    * @param event The button event.
    */
   handleButtonDown(button: string, e?: Event): void {
+
+   
+
     if (this.debug) {
       console.log('Key down:', button);
     }

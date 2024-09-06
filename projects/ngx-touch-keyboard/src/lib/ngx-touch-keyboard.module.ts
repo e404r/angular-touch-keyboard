@@ -5,9 +5,10 @@ import { PortalModule } from '@angular/cdk/portal';
 
 import { NgxTouchKeyboardDirective } from './ngx-touch-keyboard.directive';
 import { NgxTouchKeyboardComponent } from './ngx-touch-keyboard.component';
+import { ComponentNameComponent } from './component-name/component-name.component';
 
 @NgModule({
-  declarations: [NgxTouchKeyboardDirective, NgxTouchKeyboardComponent],
+  declarations: [NgxTouchKeyboardDirective, NgxTouchKeyboardComponent, ComponentNameComponent],
   imports: [CommonModule, OverlayModule, PortalModule],
   exports: [NgxTouchKeyboardDirective, NgxTouchKeyboardComponent],
 })

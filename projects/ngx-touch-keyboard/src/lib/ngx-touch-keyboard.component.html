@@ -12,6 +12,7 @@
     <div class="touch-keyboard-row">
       <ng-container *ngFor="let key of row; let keyIndex = index">
         <button
+         *ngIf="locale.display[key] !== 'nolang'"
           [name]="key"
           [dir]="locale.dir"
           class="touch-keyboard-key"
